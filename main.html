@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HTML Testing - Percobaan</title>
+  <style>
+    :root{--accent:#4f46e5;--muted:#6b7280}
+    body{font-family:Inter,ui-sans-serif,system-ui,Arial;background:#f8fafc;color:#0f172a;margin:0;padding:24px}
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);padding:18px;margin-bottom:18px}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+    h1{font-size:1.25rem;margin:0}
+    .muted{color:var(--muted);font-size:0.95rem}
+    .row{display:flex;gap:16px}
+    .col{flex:1}
+    button{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(79,70,229,0.12)}
+    input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid #e6edf3}
+    pre{background:#0b1220;color:#dbeafe;padding:12px;border-radius:8px;overflow:auto}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    .preview{min-height:240px;border:1px dashed #e6edf3;border-radius:8px;padding:12px;background:#fff}
+    .kbd{background:#111827;color:#fff;padding:2px 6px;border-radius:6px;font-size:0.8rem}
+    .flex-between{display:flex;justify-content:space-between;align-items:center}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;color:var(--accent);font-weight:600}
+    .small{font-size:0.9rem}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media (max-width:900px){.row{flex-direction:column}.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="card" style="padding:12px 16px;display:flex;align-items:center;gap:12px">
+      <div style="width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700">HT</div>
+      <div>
+        <h1>HTML Testing — Percobaan</h1>
+        <div class="muted">Halaman uji coba: komponen, live preview, dan skrip kecil</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="flex-between">
+        <div>
+          <div class="tag">Mode: Eksperimental</div>
+          <div class="muted small">Gunakan area di kanan untuk melihat hasil live dari HTML yang Anda masukkan.</div>
+        </div>
+        <div class="small muted">Tips: tekan <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> untuk render</div>
+      </div>
+    </section>
+
+    <section class="row">
+      <div class="col card">
+        <h2 style="margin-top:0">Editor HTML (input)</h2>
+        <textarea id="html-input" rows="14">&lt;h2&gt;Selamat datang&lt;/h2&gt;
+&lt;p&gt;Ini contoh paragraf. Ubah konten ini untuk mengetes preview.&lt;/p&gt;</textarea>
+
+        <div style="margin-top:12px" class="controls">
+          <button id="render-btn">Render</button>
+          <button id="clear-btn" class="ghost">Bersihkan</button>
+          <button id="load-sample" class="ghost">Load Sample</button>
+          <select id="device-select" style="width:auto;border-radius:8px">
+            <option value="desktop">Desktop</option>
+            <option value="tablet">Tablet</option>
+            <option value="mobile">Mobile</option>
+          </select>
+        </div>
+
+        <div style="margin-top:12px" class="muted">Komponen uji cepat:</div>
+        <div class="grid-3" style="margin-top:8px">
+          <button class="ghost" onclick="insertSnippet('<button>Click me</button>')">Button</button>
+          <button class="ghost" onclick="insertSnippet('<input placeholder=\"nama\">')">Input</button>
+          <button class="ghost" onclick="insertSnippet('<table border=\"1\"><tr><td>1</td><td>2</td></tr></table>')">Table</button>
+        </div>
+
+      </div>
+
+      <div class="col card">
+        <h2 style="margin-top:0">Live Preview</h2>
+        <div id="preview" class="preview"></div>
+
+        <div style="margin-top:12px" class="muted small">Output console (untuk debug JS di preview)</div>
+        <pre id="console-out">-- console output --</pre>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Tools tambahan</h2>
+      <div class="row">
+        <div class="col">
+          <h3 class="small">Upload & Image preview</h3>
+          <input type="file" id="file-input" accept="image/*">
+          <div id="img-preview" style="margin-top:8px"></div>
+        </div>
+        <div class="col">
+          <h3 class="small">Modal contoh</h3>
+          <button onclick="openModal()">Buka Modal</button>
+          <div id="modal" style="display:none;padding:16px;background:rgba(15,23,42,0.9);color:white;border-radius:8px;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);min-width:280px;z-index:40">
+            <strong>Modal Percobaan</strong>
+            <p class="muted" style="color:#d1d5db">Ini modal sederhana. Klik tombol tutup atau di luar modal.</p>
+            <div style="text-align:right">
+              <button onclick="closeModal()">Tutup</button>
+            </div>
+          </div>
+          <div id="modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.45)"></div>
+        </div>
+        <div class="col">
+          <h3 class="small">Drag & Drop (kotak)</h3>
+          <div id="drop" style="min-height:80px;border-radius:8px;border:2px dashed #e6edf3;display:flex;align-items:center;justify-content:center">Tarik file ke sini</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Utilities</h2>
+      <div class="controls">
+        <button onclick="downloadHTML()" class="ghost">Download .html</button>
+        <button onclick="copyHTML()" class="ghost">Copy HTML ke clipboard</button>
+      </div>
+    </section>
+
+    <footer class="muted" style="text-align:center;margin-top:12px">HTML Testing • dibuat untuk percobaan &amp; demo</footer>
+  </main>
+
+  <script>
+    const input = document.getElementById('html-input');
+    const preview = document.getElementById('preview');
+    const consoleOut = document.getElementById('console-out');
+    const renderBtn = document.getElementById('render-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const loadSample = document.getElementById('load-sample');
+    const deviceSelect = document.getElementById('device-select');
+
+    function writeConsole(msg){
+      consoleOut.textContent = (new Date()).toLocaleTimeString() + ' — ' + msg + '\n' + consoleOut.textContent;
+    }
+
+    function render(){
+      const html = input.value;
+      // simple sandbox: create iframe-like safe container
+      preview.innerHTML = html;
+      writeConsole('Rendered preview — length ' + html.length + ' chars');
+    }
+
+    renderBtn.addEventListener('click', render);
+    clearBtn.addEventListener('click', ()=>{input.value=''; render(); writeConsole('Cleared editor');});
+    loadSample.addEventListener('click', ()=>{
+      input.value = '<section>\n  <h2>Sample Section</h2>\n  <p>Paragraf sample dengan <strong>bold</strong> dan <em>italic</em>.</p>\n  <button onclick="alert(\'Ditekan!\')">Coba Alert</button>\n</section>';
+      render();
+      writeConsole('Loaded sample');
+    });
+
+    // keyboard shortcut Ctrl+Enter to render
+    input.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key === 'Enter'){
+        render();
+      }
+    });
+
+    // insert snippet helper
+    function insertSnippet(sn){
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const before = input.value.substring(0,start);
+      const after = input.value.substring(end);
+      input.value = before + sn + after;
+      input.focus();
+      render();
+    }
+
+    // file input preview
+    const fileInput = document.getElementById('file-input');
+    const imgPreview = document.getElementById('img-preview');
+    fileInput.addEventListener('change', ()=>{
+      const f = fileInput.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      imgPreview.innerHTML = '<img src="'+url+'" alt="preview" style="max-width:180px;border-radius:8px;border:1px solid #e6edf3">';
+      writeConsole('Image loaded: ' + f.name);
+    });
+
+    // modal
+    function openModal(){
+      document.getElementById('modal').style.display='block';
+      document.getElementById('modal-backdrop').style.display='block';
+    }
+    function closeModal(){
+      document.getElementById('modal').style.display='none';
+      document.getElementById('modal-backdrop').style.display='none';
+    }
+    document.getElementById('modal-backdrop').addEventListener('click', closeModal);
+
+    // drag & drop
+    const drop = document.getElementById('drop');
+    drop.addEventListener('dragover', (e)=>{e.preventDefault(); drop.style.background='#eef2ff'});
+    drop.addEventListener('dragleave', ()=>{drop.style.background='transparent'});
+    drop.addEventListener('drop', (e)=>{
+      e.preventDefault(); drop.style.background='transparent';
+      const f = e.dataTransfer.files[0];
+      writeConsole('Dropped file: ' + (f?f.name:'no file'));
+    });
+
+    // download HTML
+    function downloadHTML(){
+      const blob = new Blob([input.value], {type:'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'preview.html';
+      a.click();
+      writeConsole('Downloaded preview.html');
+    }
+
+    function copyHTML(){
+      navigator.clipboard.writeText(input.value).then(()=>{
+        writeConsole('Copied HTML to clipboard');
+      }).catch(()=>{writeConsole('Gagal copy (clipboard tidak tersedia)')});
+    }
+
+    // device preview resize
+    deviceSelect.addEventListener('change', ()=>{
+      const v = deviceSelect.value;
+      if(v==='desktop'){preview.style.width='100%'}
+      if(v==='tablet'){preview.style.width='720px'}
+      if(v==='mobile'){preview.style.width='360px'}
+    });
+
+    // initial render
+    render();
+  </script>
+</body>
+</html>
