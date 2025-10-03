@@ -4,25 +4,34 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    // Terima $roleId sebagai integer
-    public function handle(Request $request, Closure $next, int $roleId): Response
+    /**
+     * Handle an incoming request.
+     *
+     * Ganti "int $roleId" menjadi "string $roles"
+     */
+    public function handle(Request $request, Closure $next, string $roleIds): Response 
     {
-        // 1. Pastikan pengguna sudah login
-        if (! $request->user()) {
-            return redirect('/login');
+        if (!Auth::check()) {
+            return redirect('login');
         }
 
-        // 2. Cek apakah role ID pengguna sesuai
-        if (! $request->user()->hasRole($roleId)) {
-            // Jika tidak, kembalikan response 403 Forbidden
-            abort(403, 'Akses Ditolak: Anda tidak memiliki peran yang sesuai.'); 
+        $user = Auth::user();
+        
+        // 1. Pisahkan string ID (misal: '1|2') menjadi array
+        $allowedIds = explode('|', $roleIds); 
+        
+        // 2. Bandingkan role_id pengguna (yang merupakan integer) dengan array string ID
+        // Kita konversi role_id ke string agar in_array berfungsi dengan benar.
+        if (!in_array((string)$user->role_id, $allowedIds)) { 
+            // Ditolak
+            abort(403, 'Akses Ditolak. Anda tidak memiliki izin peran untuk halaman ini.');
         }
 
-        // 3. Jika sesuai, lanjutkan request
         return $next($request);
     }
 }

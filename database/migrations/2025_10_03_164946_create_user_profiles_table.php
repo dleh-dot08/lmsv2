@@ -11,8 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_profiles', function (Blueprint $table) {
-            $table->id();
+        Schema::create('mentor_details', function (Blueprint $table) {
+            // Relasi One-to-One ke users
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->primary('user_id');
+            
+            // Data Legal/Pajak
+            $table->string('ktp_number')->nullable()->unique();
+            $table->string('npwp_number')->nullable();
+            $table->string('ktp_file_path', 2048)->nullable();
+            $table->string('npwp_file_path', 2048)->nullable();
+            
+            // Data Rekening Bank
+            $table->string('bank_name')->nullable();
+            $table->string('account_number')->nullable();
+            $table->string('account_holder')->nullable();
+            
             $table->timestamps();
         });
     }
@@ -22,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_profiles');
+        Schema::dropIfExists('mentor_details');
     }
 };

@@ -27,12 +27,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item {{ request()->routeIs('users.index') ? 'active' : '' }}">
-                            <a href="##" class="menu-link">
+                            <a href="{{ route('users.index') }}" class="menu-link">
                                 <div data-i18n="List Pengguna">Semua Pengguna</div>
                             </a>
                         </li>
                         <li class="menu-item {{ request()->routeIs('admin.sekolah.*') ? 'active' : '' }}">
-                            <a href="##" class="menu-link">
+                            <a href="{{ route('schools.index') }}" class="menu-link">
                                 <div data-i18n="Sekolah">Data Sekolah</div>
                             </a>
                         </li>
