@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\MentorDetailController;
 use App\Http\Controllers\EmployeeDetailController;
+use App\Http\Controllers\StudentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +46,35 @@ Route::middleware(['auth', 'role:2|1'])->group(function () {
         Route::get('employee', [EmployeeDetailController::class, 'edit'])->name('details.employee.edit');
         Route::put('employee', [EmployeeDetailController::class, 'update'])->name('details.employee.update');
     });
+
+    // Rute untuk Jenjang (Level)
+    Route::resource('levels', App\Http\Controllers\LevelController::class);
+
+    // Rute untuk Kelas/Tingkatan (Grade)
+    Route::resource('grades', App\Http\Controllers\GradeController::class);
+});
+
+
+
+Route::middleware(['auth', 'role:1|2|6'])->group(function () {
+   
+    // Route CUSTOM untuk ASSIGN
+    Route::get('students/assign', [StudentController::class, 'assignForm'])->name('students.assign.form');
+    Route::post('students/assign', [StudentController::class, 'assignStore'])->name('students.assign.store'); 
+   
+    // 1. Manajemen Peserta Didik (Student)
+    // Resource route mencakup: index, create, store, show, edit, update, destroy
+    Route::resource('students', StudentController::class)->except(['destroy']);
+    
+    // **Khusus untuk Hapus/Destroy (Biasanya hanya Super Admin/Admin yang boleh menghapus permanen)**
+    // Kita berikan akses Hapus hanya untuk Super Admin (1) dan Admin (2)
+    Route::middleware('role:1|2')->group(function () {
+        Route::delete('students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
+    });
+    
+    // 2. Route untuk Master Data (Contoh, jika Anda butuh Level/Grade)
+    // Pastikan ini juga dibatasi sesuai kebutuhan Admin/Super Admin
+    // ...
 });
 
 Route::middleware('auth')->group(function () {

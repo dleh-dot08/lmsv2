@@ -63,9 +63,8 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::where('id', '!=', self::ROLE_ID_SUPER_ADMIN)->get();
-        $schools = School::all(); 
         
-        return view('users.create', compact('roles', 'schools'));
+        return view('users.create', compact('roles'));
     }
 
     /**

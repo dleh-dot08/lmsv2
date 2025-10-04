@@ -1,7 +1,5 @@
 <?php
 
-// app/Models/School.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,11 +13,17 @@ class School extends Model
     protected $fillable = [
         'school_name',
         'npsn',
-        'school_level',
+        'level_id', // PASTIKAN menggunakan level_id bukan school_level
         'full_address',
         'city',
         'headmaster_name',
     ];
+
+    public function level()
+    {
+        // Relasi ke Model Level (Jenjang)
+        return $this->belongsTo(Level::class, 'level_id');
+    }
 
     /**
      * Relasi ke PIC Sekolah (User role_id 6) melalui tabel pivot.
@@ -27,7 +31,16 @@ class School extends Model
     public function pics(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'school_pic_pivot', 'school_id', 'user_id')
-                    ->withPivot('position') // Mengambil jabatan PIC
+                    ->withPivot('position') 
                     ->withTimestamps();
+    }
+
+    public function students()
+    {
+        // Hubungkan School ke ParticipantDetail, lalu ke User
+        return $this->hasMany(ParticipantDetail::class)
+                    ->whereHas('user', function ($query) {
+                        $query->where('role_id', User::ID_PESERTA); // Asumsi User::ID_PESERTA = 4
+                    });
     }
 }

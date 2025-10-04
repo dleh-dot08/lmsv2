@@ -8,23 +8,43 @@ use Illuminate\Database\Eloquent\Model;
 class ParticipantDetail extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'user_id';
+
+      public $incrementing = false; 
     
-    // Asumsi nama tabel
     protected $table = 'participant_details'; 
     
-    // Asumsi kolom-kolom detail
     protected $fillable = [
         'user_id',
-        'category', // 'siswa', 'mahasiswa', 'umum'
-        'nisn',     // Untuk Siswa
-        'institution_name', // Nama Sekolah/Kampus/Instansi
-        'major',    // Jurusan/Bidang (untuk Mahasiswa)
-        // Tambahkan kolom lain jika ada
+        'category',
+        'nisn', // ID Peserta (Siswa/Mahasiswa)
+        'institution_name', 
+        'major',
+        // KOLOM BARU YANG DITAMBAHKAN
+        'school_id',
+        'level_id',
+        'grade_id',
     ];
 
-    // Relasi One-to-One
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    
+    // RELASI BARU
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+    
+    public function level()
+    {
+        return $this->belongsTo(Level::class);
+    }
+
+    public function grade()
+    {
+        return $this->belongsTo(Grade::class);
     }
 }

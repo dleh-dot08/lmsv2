@@ -94,8 +94,6 @@ class User extends Authenticatable
         return $this->hasOne(EmployeeDetail::class);
     }
 
-
-    
     // ==============================================
     // RELASI SEKOLAH (PIR-PIC)
     // ==============================================

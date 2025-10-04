@@ -1,17 +1,32 @@
-@extends('layouts.users.template')
+@extends('layouts.users.template') {{-- Sesuaikan dengan layout utama Anda --}}
 
 @section('content')
 
+{{-- ASUMSI KONSTANTA ROLE ID PESERTA (4) --}}
 @php
-    use App\Models\User;
-    // Ambil Role ID Super Admin
-    $superAdminId = User::ID_SUPER_ADMIN; 
+    // Ganti nilai 4 ini dengan konstanta ROLE_ID_PARTICIPANT yang benar dari Model User Anda
+    // Jika ROLE_ID_PARTICIPANT di Controller adalah 4, gunakan 4 di sini.
+    $roleIdParticipant = 4;
 @endphp
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4">
         <span class="text-muted fw-light">Manajemen /</span> Tambah Pengguna Baru
     </h4>
+
+    {{-- Notifikasi Error/Success --}}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            Gagal menyimpan data. Mohon periksa kembali input Anda.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <div class="row">
         <div class="col-md-8">
@@ -56,19 +71,15 @@
                             <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="********" required>
                         </div>
 
-                        {{-- Role --}}
+                        {{-- Role (Pemicu Kondisional) --}}
                         <div class="mb-4">
                             <label class="form-label" for="role_id">Pilih Peran (Role)</label>
                             <select name="role_id" id="role_id" class="form-select @error('role_id') is-invalid @enderror" required>
                                 <option value="">-- Pilih Peran --</option>
-                                {{-- Variabel $roles dikirim dari UserController::create() --}}
                                 @foreach ($roles as $role)
-                                    {{-- FILTER: HANYA TAMPILKAN ROLE YANG BUKAN SUPER ADMIN --}}
-                                    @if ($role->id != $superAdminId)
-                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                            {{ $role->name }}
-                                        </option>
-                                    @endif
+                                    <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                        {{ $role->name }}
+                                    </option>
                                 @endforeach
                             </select>
                             @error('role_id')
@@ -76,6 +87,22 @@
                             @enderror
                         </div>
                         
+                        {{-- FIELD KATEGORI PESERTA (KONDISIONAL) --}}
+                        <div class="mb-4" id="participant-fields" style="display: {{ old('role_id') == $roleIdParticipant || $errors->has('participant_category') ? 'block' : 'none' }};">
+                            <label class="form-label" for="participant_category">Kategori Peserta</label>
+                            <select name="participant_category" id="participant_category" class="form-select @error('participant_category') is-invalid @enderror">
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="siswa" {{ old('participant_category') == 'siswa' ? 'selected' : '' }}>Siswa</option>
+                                <option value="mahasiswa" {{ old('participant_category') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                                <option value="umum" {{ old('participant_category') == 'umum' ? 'selected' : '' }}>Umum/Lainnya</option>
+                            </select>
+                            @error('participant_category')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        {{-- END KONDISIONAL FIELD --}}
+
+
                         <a href="{{ route('users.index') }}" class="btn btn-outline-secondary me-2">Batal</a>
                         <button type="submit" class="btn btn-primary">Simpan Pengguna</button>
                     </form>
@@ -84,5 +111,35 @@
         </div>
     </div>
 </div>
+
+{{-- SCRIPT UNTUK MENAMPILKAN FIELD KATEGORI PESERTA SECARA KONDISIONAL --}}
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const roleSelect = document.getElementById('role_id');
+        const participantFields = document.getElementById('participant-fields');
+        // PASTIKAN participantRoleId SAMA DENGAN self::ROLE_ID_PARTICIPANT di Controller (Misal: 4)
+        const participantRoleId = {{ $roleIdParticipant }}; 
+
+        function toggleParticipantFields() {
+            if (roleSelect.value == participantRoleId) {
+                participantFields.style.display = 'block';
+                // Jika ditampilkan, set attribute 'required' jika diperlukan oleh validasi Anda
+                // document.getElementById('participant_category').setAttribute('required', 'required');
+            } else {
+                participantFields.style.display = 'none';
+                // Hapus nilai dan attribute 'required' saat disembunyikan
+                // document.getElementById('participant_category').removeAttribute('required');
+                // document.getElementById('participant_category').value = ''; 
+            }
+        }
+
+        roleSelect.addEventListener('change', toggleParticipantFields);
+
+        // Panggil saat load halaman untuk menangani kasus old('role_id') dan error validasi
+        toggleParticipantFields(); 
+    });
+</script>
+@endpush
 
 @endsection

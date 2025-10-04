@@ -17,25 +17,44 @@
                     <span class="menu-header-text">Master Data & Manajemen</span>
                 </li>
             @endif
-            
+
             {{-- 1. Menu Hanya untuk Super Admin & Admin --}}
             @if ($roleId == User::ID_SUPER_ADMIN || $roleId == User::ID_ADMIN)
-                <li class="menu-item {{ request()->routeIs('users.*', 'jenjang.*', 'kategori.*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->routeIs('users.*', 'schools.*', 'levels.*', 'grades.*') ? 'active open' : '' }}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon tf-icons bx bx-group"></i>
-                        <div data-i18n="Data Manajemen">Manajemen Pengguna</div>
+                        <i class="menu-icon tf-icons bx bx-data"></i>
+                        <div data-i18n="Master & Manajemen">Master Data & Manajemen</div>
                     </a>
                     <ul class="menu-sub">
+                        
+                        {{-- Manajemen Pengguna --}}
                         <li class="menu-item {{ request()->routeIs('users.index') ? 'active' : '' }}">
                             <a href="{{ route('users.index') }}" class="menu-link">
                                 <div data-i18n="List Pengguna">Semua Pengguna</div>
                             </a>
                         </li>
-                        <li class="menu-item {{ request()->routeIs('admin.sekolah.*') ? 'active' : '' }}">
+                        
+                        {{-- Data Sekolah --}}
+                        <li class="menu-item {{ request()->routeIs('schools.*') ? 'active' : '' }}">
                             <a href="{{ route('schools.index') }}" class="menu-link">
                                 <div data-i18n="Sekolah">Data Sekolah</div>
                             </a>
                         </li>
+                        
+                        {{-- Data Jenjang (Level) --}}
+                        <li class="menu-item {{ request()->routeIs('levels.*') ? 'active' : '' }}">
+                            <a href="{{ route('levels.index') }}" class="menu-link">
+                                <div data-i18n="Jenjang">Jenjang Pendidikan</div>
+                            </a>
+                        </li>
+                        
+                        {{-- Data Kelas (Grade) --}}
+                        <li class="menu-item {{ request()->routeIs('grades.*') ? 'active' : '' }}">
+                            <a href="{{ route('grades.index') }}" class="menu-link">
+                                <div data-i18n="Kelas">Kelas & Tingkatan</div>
+                            </a>
+                        </li>
+                        
                     </ul>
                 </li>
             @endif
