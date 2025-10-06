@@ -8,6 +8,14 @@ use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\MentorDetailController;
 use App\Http\Controllers\EmployeeDetailController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\BulkImportController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseScheduleController;
+use App\Http\Controllers\CourseMentorController;
+use App\Http\Controllers\CourseEnrollmentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,6 +42,36 @@ Route::middleware(['auth', 'role:2|1'])->group(function () {
 
     // --- MANAJEMEN MASTER SEKOLAH ---
     Route::resource('schools', SchoolController::class);
+
+    // --- MANAJEMEN PROGRAM  ---
+    Route::resource('programs', ProgramController::class);
+
+    // --- MANAJEMEN SEMESTER  ---
+    Route::resource('semesters', SemesterController::class);
+
+    // --- MANAJEMEN Kategori  ---
+    Route::resource('categories', CategoryController::class);
+
+    Route::resource('courses', CourseController::class);
+    Route::resource('courses.schedules', CourseScheduleController::class)->except(['show']);
+    Route::resource('courses.mentors', CourseMentorController::class)->except(['show', 'create', 'edit']);
+    Route::get('courses/{course}/schedules/{schedule}/history', [CourseScheduleController::class, 'history'])->name('courses.schedules.history');
+    
+    // Rute untuk Update Status Peserta
+    Route::put('courses/{course}/enrollments/{student}', [CourseEnrollmentController::class, 'update'])
+        ->name('courses.enrollments.update')
+        ->withTrashed()
+        ->scopeBindings();
+
+    // Rute untuk Menghapus Peserta
+    Route::delete('courses/{course}/enrollments/{student}', [CourseEnrollmentController::class, 'destroy'])
+        ->name('courses.enrollments.destroy')
+        ->withTrashed()
+        ->scopeBindings();
+
+    // Rute Index dan Store (Biarkan sama)
+    Route::get('courses/{course}/enrollments', [CourseEnrollmentController::class, 'index'])->name('courses.enrollments.index');
+    Route::post('courses/{course}/enrollments', [CourseEnrollmentController::class, 'store'])->name('courses.enrollments.store');
 
     // --- MANAJEMEN DETAIL KHUSUS (DIEDIT OLEH ADMIN/USER) ---
     // Rute ini bisa diletakkan di luar grup admin jika user diizinkan mengedit dirinya sendiri
@@ -82,5 +120,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Tampilkan form upload
+Route::get('/bulk-import', [BulkImportController::class, 'showImportForm'])->name('students.show_import');
+
+// Menerima file upload dan simpan ke staging
+Route::post('/bulk-import/upload', [BulkImportController::class, 'uploadFile'])->name('students.upload_file');
+
+Route::get('/bulk-import/template/{type}', [BulkImportController::class, 'downloadTemplate'])->name('students.download_template');
+
+// Halaman review data staging
+Route::get('/bulk-import/review/{batchToken}', [BulkImportController::class, 'reviewStaging'])->name('students.review');
+
+// Final commit ke database utama
+Route::post('/bulk-import/commit/{batchToken}', [BulkImportController::class, 'commitStaging'])->name('students.commit');
 
 require __DIR__.'/auth.php';

@@ -54,7 +54,52 @@
                                 <div data-i18n="Kelas">Kelas & Tingkatan</div>
                             </a>
                         </li>
+
+                        {{-- Data Bulk Peserta --}}
+                        <li class="menu-item {{ request()->routeIs('students.*') ? 'active' : '' }}">
+                            <a href="{{ route('students.show_import') }}" class="menu-link">
+                                <div data-i18n="Kelas">Import Data Massal</div>
+                            </a>
+                        </li>
+
+                        {{-- Data Pogram --}}
+                        <li class="menu-item {{ request()->routeIs('programs.*') ? 'active' : '' }}">
+                            <a href="{{ route('programs.index') }}" class="menu-link">
+                                <div data-i18n="Kelas">Data Program</div>
+                            </a>
+                        </li>
+
+                        {{-- Data Semester --}}
+                        <li class="menu-item {{ request()->routeIs('semesters.*') ? 'active' : '' }}">
+                            <a href="{{ route('semesters.index') }}" class="menu-link">
+                                <div data-i18n="Kelas">Data Semester</div>
+                            </a>
+                        </li>
+
+                        {{-- Data Kategori --}}
+                        <li class="menu-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <a href="{{ route('categories.index') }}" class="menu-link">
+                                <div data-i18n="Kelas">Data Kategori</div>
+                            </a>
+                        </li>
                         
+                    </ul>
+                </li>
+            @endif
+
+            {{-- 2. Menu Khusus Mentor dan Admin/Super Admin --}}
+            @if ($roleId == User::ID_SUPER_ADMIN || $roleId == User::ID_ADMIN || $roleId == User::ID_MENTOR)
+                <li class="menu-item {{ request()->routeIs('courses.*', 'kelas.*') ? 'active open' : '' }}">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-book"></i>
+                        <div data-i18n="Materi">Manajemen Kursus</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {{ request()->routeIs('courses.index') ? 'active' : '' }}">
+                            <a href="{{ route('courses.index') }}" class="menu-link">
+                                <div data-i18n="Materi Kursus">Data Kursus</div>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             @endif

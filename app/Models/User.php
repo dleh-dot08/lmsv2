@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 class User extends Authenticatable
@@ -106,5 +107,41 @@ class User extends Authenticatable
         return $this->belongsToMany(School::class, 'school_pic_pivot', 'user_id', 'school_id')
                     ->withPivot('position') // Mengambil kolom 'position' dari tabel pivot
                     ->withTimestamps();
+    }
+
+    public function enrolledCourses(): BelongsToMany
+    {
+        // Menggunakan tabel pivot 'course_enrollments'
+        return $this->belongsToMany(Course::class, 'course_enrollments', 'user_id', 'course_id')
+                    ->using(CourseEnrollment::class) // Menggunakan Model Pivot (jika sudah dibuat)
+                    ->withPivot('status') 
+                    ->withTimestamps(); 
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class, 'school_id');
+    }
+
+    public function grade(): BelongsTo
+    {
+        // Asumsi kolom foreign key tetap 'grade_id' di tabel users.
+        return $this->belongsTo(Grade::class, 'grade_id');
+    }
+
+    public function level(): BelongsTo
+    {
+        // Tambahkan relasi level untuk filter jenjang
+        return $this->belongsTo(Level::class, 'level_id');
+    }
+
+    public function participantDetails(): HasOne
+    {
+        return $this->hasOne(ParticipantDetail::class, 'user_id', 'id');
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'id';
     }
 }
